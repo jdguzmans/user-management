@@ -1,0 +1,23 @@
+version: '3.1'
+services:
+  mongodb:
+    image: mongo:7.0
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    volumes:
+      - mongodb-ticktuk:/data/db
+  
+  redis:
+    image: redis:7.4.1
+    ports:
+      - 6379:6379
+    volumes:
+      - redis-ticktuk:/data
+
+# docker volume create mongodb-ticktuk
+volumes:
+  mongodb-ticktuk:
+  redis-ticktuk:

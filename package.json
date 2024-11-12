@@ -1,0 +1,11 @@
+{
+  "name": "ticktuk-test",
+  "private": true,
+  "packageManager": "yarn@3.5.1",
+  "workspaces": [
+    "packages/eslint-config",
+    "packages/utils",
+    "apps/back",
+    "apps/front"
+  ]
+}

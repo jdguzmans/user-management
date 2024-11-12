@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  back:
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - "4050:4050"
+    restart: always

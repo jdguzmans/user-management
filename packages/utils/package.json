@@ -1,0 +1,14 @@
+{
+    "name": "@ticktuk-test/utils",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc --build --force",
+        "lint": "npx eslint --ext .ts ."
+    },
+    "dependencies": {
+        "typescript": "4.9.3",
+        "yup": "^1.4.0"
+    }
+}
