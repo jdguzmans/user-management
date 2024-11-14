@@ -2,11 +2,13 @@ import React, { useState } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Modal from '@mui/material/Modal'
-import { Button, TextField } from '@mui/material'
+import { Button } from '@mui/material'
 import { USER_GENDER } from '@ticktuk-test/utils'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
+import TextField from '../../../components/text-field'
+import * as yup from 'yup'
 
 enum STEP {
   FIRT_NAME = `FIRST_NAME`,
@@ -24,12 +26,7 @@ interface IAddedUser {
   description: string
 }
 
-interface IProps {
-  isOpen: boolean
-  setIsOpen: (o: boolean) => void
-  addUser: (u: IAddedUser) => Promise<void>
-  isLoading: boolean
-}
+const emailSchema = yup.string().min(1).email().nonNullable()
 const style = {
   position: `absolute`,
   top: `50%`,
@@ -41,6 +38,12 @@ const style = {
   boxShadow: 24,
   p: 4
 }
+interface IProps {
+  isOpen: boolean
+  setIsOpen: (o: boolean) => void
+  addUser: (u: IAddedUser) => Promise<void>
+  isLoading: boolean
+}
 export default function AddUserModal (props: IProps) {
   const [step, setStep] = useState<STEP>(STEP.FIRT_NAME)
 
@@ -49,6 +52,8 @@ export default function AddUserModal (props: IProps) {
   const [email, setEmail] = useState(``)
   const [gender, setGender] = useState<USER_GENDER | ``>(``)
   const [description, setDescription] = useState(``)
+
+  const [emailError, setEmailError] = useState(``)
 
   function onClose () {
     props.setIsOpen(false)
@@ -66,23 +71,35 @@ export default function AddUserModal (props: IProps) {
     if (props.isLoading) return
 
     if (step === STEP.FIRT_NAME) {
+      if (firstname === ``) return
       setStep(STEP.LAST_NAME)
       return
     }
     if (step === STEP.LAST_NAME) {
+      if (lastname === ``) return
       setStep(STEP.EMAIL)
       return
     }
     if (step === STEP.EMAIL) {
+      if (email === ``) return
+      if (emailError) setEmailError(``)
+      try {
+        emailSchema.validateSync(email)
+      } catch (e) {
+        setEmailError(`Email not valid`)
+        return
+      }
       setStep(STEP.GENDER)
       return
     }
     if (step === STEP.GENDER) {
+      if (gender === ``) return
       setStep(STEP.DESCRIPTION)
       return
     }
     if (step === STEP.DESCRIPTION) {
       if (gender === ``) throw new Error(`Gender should not be emtpy`)
+      if (description === ``) return
       await props.addUser({ firstname, lastname, email, gender, description })
 
       setStep(STEP.FIRT_NAME)
@@ -135,7 +152,10 @@ export default function AddUserModal (props: IProps) {
       return (
         <TextField
           value={firstname}
-          onChange={v => setFirstname(v.target.value)}
+          onChange={setFirstname}
+          isDisabled={props.isLoading}
+          onEnter={onContinue}
+          onShiftEnter={onContinue}
         />
       )
     }
@@ -143,7 +163,10 @@ export default function AddUserModal (props: IProps) {
       return (
         <TextField
           value={lastname}
-          onChange={v => setLastname(v.target.value)}
+          onChange={setLastname}
+          isDisabled={props.isLoading}
+          onEnter={onContinue}
+          onShiftEnter={onContinue}
         />
       )
     }
@@ -152,7 +175,14 @@ export default function AddUserModal (props: IProps) {
         <TextField
           type='email'
           value={email}
-          onChange={v => setEmail(v.target.value)}
+          onChange={v => {
+            if (emailError !== ``) setEmailError(``)
+            setEmail(v)
+          }}
+          isDisabled={props.isLoading}
+          onEnter={onContinue}
+          onShiftEnter={onContinue}
+          error={emailError}
         />
       )
     }
@@ -161,6 +191,7 @@ export default function AddUserModal (props: IProps) {
         <Select
           value={gender}
           onChange={v => setGender(v.target.value as USER_GENDER)}
+          disabled={props.isLoading}
         >
           {Object.values(USER_GENDER).map(p => {
             return (
@@ -175,8 +206,11 @@ export default function AddUserModal (props: IProps) {
         <TextField
           multiline
           minRows={4}
+          maxRows={6}
           value={description}
-          onChange={v => v.target.value.length <= 200 && setDescription(v.target.value)}
+          onChange={v => v.length <= 200 && setDescription(v)}
+          isDisabled={props.isLoading}
+          onShiftEnter={onContinue}
         />
       )
     }
