@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react'
 
-import { Box, Button } from '@mui/material'
+import { Box } from '@mui/material'
 
 import { IUser } from 'src/entities/user/types'
 
-import * as userService from '../../entities/user/service'
-import { USER_GENDER } from '@ticktuk-test/utils'
-
 import AddUserModal from './add-user-modal'
 import UserTable from './user-table'
+import OperationsPanel from './operations-panel'
 
+import * as userService from '../../entities/user/service'
+import { USER_GENDER } from '@ticktuk-test/utils'
 import _ from 'lodash'
 
 export default function Home () {
@@ -78,14 +78,11 @@ export default function Home () {
             gap: `20px`,
             borderRadius: `10px`
           }}>
-          <Box sx={{ display: `flex`, justifyContent: `flex-end`, gap: `20px` }}>
-            <Button variant='outlined' onClick={fetchUsers}>
-              Refresh
-            </Button>
-            <Button variant='contained' onClick={openAddUserModal}>
-              Add
-            </Button>
-          </Box>
+          <OperationsPanel
+            users={users}
+            fetchUsers={fetchUsers}
+            openAddUserModal={openAddUserModal}
+          />
           <UserTable
             users={users}
             selectedPage={selectedPage}
